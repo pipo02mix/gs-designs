@@ -1317,8 +1317,9 @@
                             <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95); margin-bottom: 6px;">
                                 <strong>Plus:</strong> <span id="engineers-freed" style="color: var(--gs-orange); font-weight: 700;">6 engineers</span> redirected + <strong>6-12 months</strong> faster
                             </div>
-                            <div id="gs-fte" style="font-size: 0.9rem; color: rgba(255,255,255,0.9);">
-                                FTEs with GS: 0.5
+                            <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95);">
+                                <strong>FTEs with Giant Swarm:</strong>
+                                <span id="gs-fte" style="color: var(--gs-orange); font-weight: 700;">0.5</span>
                             </div>
                         </div>
                     </div>
@@ -1524,7 +1525,7 @@
             document.getElementById('gs-cost').textContent = formatEuro(gsCost);
             document.getElementById('savings').textContent = formatEuro(savings);
             document.getElementById('engineers-freed').textContent = engineersFreed + ' engineers';
-            document.getElementById('gs-fte').textContent = 'FTEs with Giant Swarm: ' + gsFTE;
+            document.getElementById('gs-fte').textContent = gsFTE;
         }
 
         // Initialize calculator on load
