@@ -656,22 +656,22 @@
                 font-size: 2.5rem;
                 margin-bottom: 20px;
             }
-            
+
             .hero-title-sub {
                 font-size: 1.5rem;
                 margin-bottom: 28px;
             }
-            
+
             .hero-subtitle {
                 font-size: 1.1rem;
                 margin-bottom: 36px;
             }
-            
+
             .trust-bar {
                 margin-top: 50px;
                 padding-top: 40px;
             }
-            
+
             .outcome-cards,
             .villain-stats,
             .proof-stats,
@@ -1241,16 +1241,16 @@
                 </p>
 
                 <div style="background: var(--white); border-radius: 12px; padding: 35px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);">
-                    
+
                     <!-- Sliders -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
                         <div>
                             <label style="display: block; font-size: 0.95rem; font-weight: 600; color: var(--gs-blue); margin-bottom: 12px;">
-                                Cluster Count
+                                Core Count (vCPUs)
                             </label>
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <input type="range" id="clusters" min="5" max="100" value="20" style="flex: 1; accent-color: var(--gs-orange);" oninput="autoUpdateTeamSize()">
-                                <span id="clusters-value" style="font-size: 1.5rem; font-weight: 700; color: var(--gs-vivid-blue); min-width: 45px;">20</span>
+                                <input type="range" id="cores" min="1" max="6" value="3" style="flex: 1; accent-color: var(--gs-orange);" oninput="autoUpdateTeamSize()">
+                                <span id="cores-value" style="font-size: 1.1rem; font-weight: 700; color: var(--gs-vivid-blue); min-width: 90px;">500</span>
                             </div>
                         </div>
                         <div>
@@ -1314,8 +1314,11 @@
                             </div>
                         </div>
                         <div style="text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
-                            <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95);">
+                            <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95); margin-bottom: 6px;">
                                 <strong>Plus:</strong> <span id="engineers-freed" style="color: var(--gs-orange); font-weight: 700;">6 engineers</span> redirected + <strong>6-12 months</strong> faster
+                            </div>
+                            <div id="gs-fte" style="font-size: 0.9rem; color: rgba(255,255,255,0.9);">
+                                FTEs with GS: 0.5
                             </div>
                         </div>
                     </div>
@@ -1354,14 +1357,14 @@
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const targetTab = tab.getAttribute('data-tab');
-                
+
                 // Remove active class from all tabs and contents
                 tabs.forEach(t => t.classList.remove('active'));
                 tabContents.forEach(tc => tc.classList.remove('active'));
-                
+
                 // Add active class to clicked tab
                 tab.classList.add('active');
-                
+
                 // Show corresponding content
                 const targetContent = document.querySelector(`[data-content="${targetTab}"]`);
                 if (targetContent) {
@@ -1370,71 +1373,85 @@
             });
         });
 
-        // Auto-update team size based on capabilities and cluster count
+        // Core range labels for ROI slider
+        const coreRanges = {
+            1: '125',
+            2: '250',
+            3: '500',
+            4: '1,000',
+            5: '1,500',
+            6: '2,000'
+        };
+
+        // Auto-update team size based on capabilities and core count
         function autoUpdateTeamSize() {
-            // FTE estimates per capability (from your product data)
+            // FTE estimates per capability based on your table
+            // (values are the same across all core buckets; caps are applied per bucket later)
             const ftePerCap = {
-                'cap-k8s': 3,      // Kubernetes: 3 FTE base
-                'cap-obs': 3,      // Observability: 3 FTE
-                'cap-sec': 2.5,    // Security: 2-3 FTE
-                'cap-net': 2.5,    // Connectivity: 2-3 FTE
-                'cap-ai': 4,       // AI: 3-5 FTE
-                'cap-edge': 2      // Edge: 2 FTE
+                'cap-k8s': 2,  // Kubernetes
+                'cap-obs': 2,  // Observability
+                'cap-sec': 2,  // Security
+                'cap-net': 1,  // Connectivity
+                'cap-ai': 2,   // AI Infra
+                'cap-edge': 2  // Edge
             };
-            
-            // Base FTE for selected capabilities
-            let baseFTE = 0;
+
+            // Enforce dependency: AI Infrastructure and Edge/IIoT require Kubernetes
+            const k8sCheckbox = document.getElementById('cap-k8s');
+            const aiCheckbox = document.getElementById('cap-ai');
+            const edgeCheckbox = document.getElementById('cap-edge');
+
+            if ((aiCheckbox && aiCheckbox.checked) || (edgeCheckbox && edgeCheckbox.checked)) {
+                if (k8sCheckbox && !k8sCheckbox.checked) {
+                    k8sCheckbox.checked = true;
+                }
+            }
+
+            // Base FTE for selected capabilities (DIY team size before capping)
+            let totalFTE = 0;
             Object.keys(ftePerCap).forEach(capId => {
                 const checkbox = document.getElementById(capId);
                 if (checkbox && checkbox.checked) {
-                    baseFTE += ftePerCap[capId];
+                    totalFTE += ftePerCap[capId];
                 }
             });
-            
-            // Get cluster count
-            const clusters = parseInt(document.getElementById('clusters').value);
-            
-            // Scale factor based on cluster count (more clusters = more ops overhead)
-            // 10-20 clusters = base, 50+ clusters = +20%, 100 clusters = +40%
-            let scaleFactor = 1.0;
-            if (clusters > 50) {
-                scaleFactor = 1.3;
-            } else if (clusters > 30) {
-                scaleFactor = 1.2;
-            } else if (clusters > 20) {
-                scaleFactor = 1.1;
-            }
-            
-            // Calculate total team needed
-            let totalFTE = Math.round(baseFTE * scaleFactor);
-            
+
+            // Get selected core range bucket (1-6)
+            const coresBucket = parseInt(document.getElementById('cores').value);
+
+            // Cap DIY FTE per core bucket (FTE DIY row)
+            // Buckets: 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000
+            const diyFTECaps = [3.0, 4.0, 6.0, 8.0, 9.0, 10.0];
+            const diyIndex = Math.min(Math.max(coresBucket, 1), 6) - 1;
+            totalFTE = Math.min(totalFTE, diyFTECaps[diyIndex]);
+
             // Minimum 3 engineers
             totalFTE = Math.max(3, totalFTE);
-            
+
             // Update team slider and display
             document.getElementById('team').value = totalFTE;
             document.getElementById('team-value').textContent = totalFTE;
-            
+
             // Trigger ROI calculation
             calculateROI();
         }
-        
+
         // Manual team adjustment (if user overrides)
         function manualTeamAdjust() {
             const teamSize = parseInt(document.getElementById('team').value);
             document.getElementById('team-value').textContent = teamSize;
             calculateROI();
         }
-        
+
         // ROI Calculator
         function calculateROI() {
             // Get inputs
             const teamSize = parseInt(document.getElementById('team').value);
-            const clusters = parseInt(document.getElementById('clusters').value);
-            
-            // Update cluster display
-            document.getElementById('clusters-value').textContent = clusters;
-            
+            const coresBucket = parseInt(document.getElementById('cores').value);
+
+            // Update core range display
+            document.getElementById('cores-value').textContent = coreRanges[coresBucket] || '';
+
             // Count selected capabilities
             const capabilities = [
                 document.getElementById('cap-k8s'),
@@ -1444,23 +1461,56 @@
                 document.getElementById('cap-ai'),
                 document.getElementById('cap-edge')
             ];
-            
+
             const selectedCaps = capabilities.filter(cap => cap && cap.checked);
             const capCount = selectedCaps.length;
-            
+
             // Calculate DIY cost (€120K per FTE average)
             const diyCost = teamSize * 120000;
-            
+
             // Calculate Giant Swarm cost
-            // 3 FTE liaison team + platform fees (~€100K per capability)
-            const gsCost = (3 * 120000) + (capCount * 100000);
-            
+            // 3 FTE liaison team + platform fees per selected capability and core range
+            // Pricing table indexed by core bucket (1-6) corresponding to:
+            // 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000 cores
+            const capPricesByCore = {
+                'cap-k8s': [57600, 108000, 144000, 180000, 240000, 288000],  // Kubernetes
+                'cap-obs': [33600,  63000,  84000, 105000, 140000, 168000],  // Observability
+                'cap-sec': [33600,  63000,  84000, 105000, 140000, 168000],  // Security
+                'cap-net': [19200,  36000,  48000,  60000,  80000,  96000],  // Connectivity
+                'cap-ai' : [33600,  63000,  84000, 105000, 140000, 168000],  // AI Infrastructure (reqs k8s)
+                'cap-edge': [33600, 63000,  84000, 105000, 140000, 168000]   // Edge/IoT (reqs k8s)
+            };
+
+            let gsPlatformFees = 0;
+            selectedCaps.forEach(cap => {
+                if (cap && cap.id && capPricesByCore[cap.id]) {
+                    const priceList = capPricesByCore[cap.id];
+                    const index = Math.min(Math.max(coresBucket, 1), 6) - 1; // clamp to 0-5
+                    gsPlatformFees += priceList[index];
+                }
+            });
+
+            // Base GS cost before applying target caps
+            let gsCost = (3 * 120000) + gsPlatformFees;
+
+            // Cap GS cost per core bucket (Target Price Total per core step)
+            // Buckets: 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000
+            const targetGsTotals = [96000, 180000, 240000, 300000, 400000, 480000];
+            const coreIndex = Math.min(Math.max(coresBucket, 1), 6) - 1; // 0-5
+            gsCost = Math.min(gsCost, targetGsTotals[coreIndex]);
+
             // Calculate savings
             const savings = Math.max(0, diyCost - gsCost);
-            
+
             // Calculate engineers freed (team size - 3 liaison)
             const engineersFreed = Math.max(0, teamSize - 3);
-            
+
+            // Calculate FTEs needed with Giant Swarm based on core bucket
+            // Cores buckets: 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000
+            const gsFTEByCore = [0.5, 0.5, 1.0, 1.0, 1.5, 1.5];
+            const gsFTEIndex = Math.min(Math.max(coresBucket, 1), 6) - 1;
+            const gsFTE = gsFTEByCore[gsFTEIndex];
+
             // Format numbers
             const formatEuro = (num) => {
                 if (num >= 1000000) {
@@ -1468,14 +1518,15 @@
                 }
                 return '€' + (num / 1000).toFixed(0) + 'K';
             };
-            
+
             // Update display
             document.getElementById('diy-cost').textContent = formatEuro(diyCost);
             document.getElementById('gs-cost').textContent = formatEuro(gsCost);
             document.getElementById('savings').textContent = formatEuro(savings);
             document.getElementById('engineers-freed').textContent = engineersFreed + ' engineers';
+            document.getElementById('gs-fte').textContent = 'FTEs with Giant Swarm: ' + gsFTE;
         }
-        
+
         // Initialize calculator on load
         document.addEventListener('DOMContentLoaded', () => {
             autoUpdateTeamSize();
