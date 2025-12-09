@@ -1237,7 +1237,8 @@
             <div style="max-width: 700px; margin: 0 auto;">
                 <h2 style="font-size: 1.75rem; font-weight: 700; color: var(--gs-blue); margin-bottom: 10px; text-align: center;">Calculate Your Savings</h2>
                 <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 30px; text-align: center;">
-                    Select capabilities to see your personalized ROI
+                  Select number of cores, capabilities and delivery model to see your personalized savings with Giant Swarm.
+
                 </p>
 
                 <div style="background: var(--white); border-radius: 12px; padding: 35px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);">
@@ -1249,8 +1250,8 @@
                                 Core Count (vCPUs)
                             </label>
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <input type="range" id="cores" min="1" max="6" value="3" style="flex: 1; accent-color: var(--gs-orange);" oninput="autoUpdateTeamSize()">
-                                <span id="cores-value" style="font-size: 1.1rem; font-weight: 700; color: var(--gs-vivid-blue); min-width: 90px;">500</span>
+                                <input type="range" id="cores" min="1" max="6" value="2" style="flex: 1; accent-color: var(--gs-orange);" oninput="updateResult()">
+                                <span id="cores-value" style="font-size: 1.1rem; font-weight: 700; color: var(--gs-vivid-blue); min-width: 90px;">250</span>
                             </div>
                         </div>
                         <div>
@@ -1258,70 +1259,116 @@
                                 Team Size
                             </label>
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <input type="range" id="team" min="3" max="25" value="10" style="flex: 1; accent-color: var(--gs-vivid-blue);" oninput="manualTeamAdjust()">
-                                <span id="team-value" style="font-size: 1.5rem; font-weight: 700; color: var(--gs-vivid-blue); min-width: 45px;">10</span>
+                                <input type="range" id="team" min="3" max="25" value="4" style="flex: 1; accent-color: var(--gs-vivid-blue);" oninput="manualTeamAdjust()">
+                                <span id="team-value" style="font-size: 1.5rem; font-weight: 700; color: var(--gs-vivid-blue); min-width: 45px;">4</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Capabilities Checkboxes - Compact -->
-                    <div style="margin-bottom: 25px;">
+                    <div style="margin-bottom: 20px;">
                         <label style="display: block; font-size: 0.95rem; font-weight: 600; color: var(--gs-blue); margin-bottom: 12px; text-align: center;">
                             Select Capabilities
                         </label>
                         <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
                             <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--gs-white); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
-                                <input type="checkbox" id="cap-k8s" checked onchange="autoUpdateTeamSize()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
+                                <input type="checkbox" id="cap-k8s" checked onchange="updateResult()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
                                 <span style="font-weight: 500;">Kubernetes</span>
                             </label>
                             <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--gs-white); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
-                                <input type="checkbox" id="cap-obs" checked onchange="autoUpdateTeamSize()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
+                                <input type="checkbox" id="cap-obs" checked onchange="updateResult()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
                                 <span style="font-weight: 500;">Observability</span>
                             </label>
                             <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--gs-white); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
-                                <input type="checkbox" id="cap-sec" checked onchange="autoUpdateTeamSize()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
+                                <input type="checkbox" id="cap-sec" checked onchange="updateResult()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
                                 <span style="font-weight: 500;">Security</span>
                             </label>
                             <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--gs-white); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
-                                <input type="checkbox" id="cap-net" onchange="autoUpdateTeamSize()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
+                                <input type="checkbox" id="cap-net" checked onchange="updateResult()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
                                 <span style="font-weight: 500;">Connectivity</span>
                             </label>
                             <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--gs-white); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
-                                <input type="checkbox" id="cap-ai" onchange="autoUpdateTeamSize()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
+                                <input type="checkbox" id="cap-ai" onchange="updateResult()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
                                 <span style="font-weight: 500;">AI Infrastructure</span>
                             </label>
                             <label style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--gs-white); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
-                                <input type="checkbox" id="cap-edge" onchange="autoUpdateTeamSize()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
+                                <input type="checkbox" id="cap-edge" onchange="updateResult()" style="width: 18px; height: 18px; accent-color: var(--gs-orange);">
                                 <span style="font-weight: 500;">Edge/IIoT</span>
                             </label>
+                        </div>
+                        <!-- Full Platform Toggle -->
+                        <div style="display: flex; justify-content: center; margin: 10px 0;">
+                            <label style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(6, 82, 170, 0.06); border: 1px dashed var(--gs-blue); border-radius: 999px; cursor: pointer; font-size: 0.9rem; color: var(--gs-blue);">
+                                <input type="checkbox" id="full-platform-toggle" onchange="handleFullPlatformToggle()" style="width: 16px; height: 16px; accent-color: var(--gs-orange);">
+                                <span style="font-weight: 500;">Full platform</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Model Selector -->
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 0.95rem; font-weight: 600; color: var(--gs-blue); margin-bottom: 12px; text-align: center;">
+                            Delivery Model
+                        </label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                            <label style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--gs-white); border: 2px solid var(--border-color); border-radius: 20px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
+                                <input type="radio" name="delivery-model" id="delivery-expert" value="expert" checked onchange="updateResult()" style="width: 16px; height: 16px; accent-color: var(--gs-orange);">
+                                <span style="font-weight: 500;">Enterprise Support</span>
+                            </label>
+                            <label id="delivery-managed-label" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--gs-white); border: 2px solid var(--border-color); border-radius: 20px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s;">
+                                <input type="radio" name="delivery-model" id="delivery-managed" value="managed" onchange="updateResult()" style="width: 16px; height: 16px; accent-color: var(--gs-orange);">
+                                <span style="font-weight: 500;">Fully-Managed with SLA</span>
+                            </label>
+                        </div>
+                        <div id="delivery-tip" style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">
                         </div>
                     </div>
 
                     <!-- Results - Compact -->
                     <div style="background: linear-gradient(135deg, var(--gs-blue) 0%, var(--gs-electric-blue) 100%); border-radius: 10px; padding: 30px;">
+                        <div style="text-align: center; margin-bottom: 16px;">
+                            <div style="font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 4px;">
+                                Total Cost of Ownership
+                            </div>
+                            <div style="font-size: 0.95rem; color: rgba(255,255,255,0.9);">
+                                Compare in-house DIY vs. Giant Swarm including platform fees and in-house team costs
+                            </div>
+                        </div>
                         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
                             <div style="text-align: center;">
-                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 5px;">DIY Cost</div>
-                                <div id="diy-cost" style="font-size: 1.75rem; font-weight: 700; color: var(--white);">€1.1M</div>
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 5px;">DIY Cost (in-house platform team only)</div>
+                                <div id="diy-cost" style="font-size: 1.75rem; font-weight: 700; color: var(--white);">€480K</div>
+                                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95);">
+                                  <strong>Estimated FTEs with DIY:</strong>
+                                  <span id="diy-fte" style="color: var(--gs-orange); font-weight: 700;">4</span>
+                              </div>
                             </div>
                             <div style="text-align: center;">
-                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 5px;">Giant Swarm</div>
-                                <div id="gs-cost" style="font-size: 1.75rem; font-weight: 700; color: var(--white);">€660K</div>
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-bottom: 5px;">Giant Swarm Cost (platform fees + in-house FTEs)</div>
+                                <div id="gs-cost" style="font-size: 1.75rem; font-weight: 700; color: var(--white);">€180K</div>
+                                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95);">
+                                  <strong>Estimated FTEs with Giant Swarm:</strong>
+                                  <span id="gs-fte" style="color: var(--gs-orange); font-weight: 700;">0.5</span>
+                              </div>
                             </div>
                             <div style="text-align: center; background: var(--gs-orange); border-radius: 6px; padding: 8px;">
-                                <div style="font-size: 0.75rem; color: var(--white); margin-bottom: 5px; font-weight: 600;">You Save</div>
+                                <div style="font-size: 0.75rem; color: var(--white); margin-bottom: 5px; font-weight: 600;">You Save (TCO)</div>
                                 <div id="savings" style="font-size: 1.75rem; font-weight: 700; color: var(--white);">€440K</div>
                             </div>
                         </div>
-                        <div style="text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
-                            <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95); margin-bottom: 6px;">
-                                <strong>Plus:</strong> <span id="engineers-freed" style="color: var(--gs-orange); font-weight: 700;">6 engineers</span> redirected + <strong>6-12 months</strong> faster
+                        <div style="padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.2);">
+                            <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95); margin-bottom: 6px; text-align: center;">
+                                <strong>Additional benefits when choosing Giant Swarm:</strong>
                             </div>
-                            <div style="font-size: 0.95rem; color: rgba(255,255,255,0.95);">
-                                <strong>FTEs with Giant Swarm:</strong>
-                                <span id="gs-fte" style="color: var(--gs-orange); font-weight: 700;">0.5</span>
-                            </div>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.9rem; color: rgba(255,255,255,0.9); text-align: left; max-width: 520px; margin-inline: auto;">
+                                <li style="margin-bottom: 4px;">• <span id="engineers-freed" style="color: var(--gs-orange); font-weight: 700;">6 engineers</span> redirected to business-value work</li>
+                                <li style="margin-bottom: 4px;">• <strong>6–24 months</strong> faster time to market</li>
+                                <li style="margin-bottom: 4px;">• <strong>30–40%</strong> infrastructure and cloud cost savings</li>
+                                <li style="margin-bottom: 4px;">• License and support cost savings</li>
+                                <li>• Reduced downtime and incident impact</li>
+                            </ul>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1384,8 +1431,27 @@
             6: '2,000'
         };
 
-        // Auto-update team size based on capabilities and core count
-        function autoUpdateTeamSize() {
+        // Handle "Full platform" toggle: check/uncheck all capabilities
+        function handleFullPlatformToggle() {
+            const fullToggle = document.getElementById('full-platform-toggle');
+            if (!fullToggle) return;
+
+            const selectAll = fullToggle.checked;
+            const capIds = ['cap-k8s', 'cap-obs', 'cap-sec', 'cap-net', 'cap-ai', 'cap-edge'];
+
+            capIds.forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    checkbox.checked = selectAll;
+                }
+            });
+
+            // Recalculate everything after changing capabilities
+            updateResult();
+        }
+
+        // Auto-update results based on capabilities, cores, and delivery model
+        function updateResult() {
             // FTE estimates per capability based on your table
             // (values are the same across all core buckets; caps are applied per bucket later)
             const ftePerCap = {
@@ -1409,13 +1475,24 @@
             }
 
             // Base FTE for selected capabilities (DIY team size before capping)
-            let totalFTE = 0;
+            let totalFTE_DIY = 0;
             Object.keys(ftePerCap).forEach(capId => {
                 const checkbox = document.getElementById(capId);
                 if (checkbox && checkbox.checked) {
-                    totalFTE += ftePerCap[capId];
+                    totalFTE_DIY += ftePerCap[capId];
                 }
             });
+
+            // Keep "Full platform" toggle in sync with actual capability selection
+            const capIds = ['cap-k8s', 'cap-obs', 'cap-sec', 'cap-net', 'cap-ai', 'cap-edge'];
+            const allChecked = capIds.every(id => {
+                const cb = document.getElementById(id);
+                return cb && cb.checked;
+            });
+            const fullToggle = document.getElementById('full-platform-toggle');
+            if (fullToggle) {
+                fullToggle.checked = allChecked;
+            }
 
             // Get selected core range bucket (1-6)
             const coresBucket = parseInt(document.getElementById('cores').value);
@@ -1424,14 +1501,49 @@
             // Buckets: 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000
             const diyFTECaps = [3.0, 4.0, 6.0, 8.0, 9.0, 10.0];
             const diyIndex = Math.min(Math.max(coresBucket, 1), 6) - 1;
-            totalFTE = Math.min(totalFTE, diyFTECaps[diyIndex]);
+            totalFTE_DIY = Math.min(totalFTE_DIY, diyFTECaps[diyIndex]);
 
-            // Minimum 3 engineers
-            totalFTE = Math.max(3, totalFTE);
+            // Calculate FTEs needed with Giant Swarm based on core bucket
+            // Cores buckets: 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000
+            const gsFTEByCore = [0.5, 0.5, 1.0, 1.0, 1.5, 1.5];
+            const gsFTEIndex = Math.min(Math.max(coresBucket, 1), 6) - 1;
+            const gsFTE = gsFTEByCore[gsFTEIndex];
 
-            // Update team slider and display
-            document.getElementById('team').value = totalFTE;
-            document.getElementById('team-value').textContent = totalFTE;
+            // Current team size from slider
+            const teamSize = parseInt(document.getElementById('team').value);
+
+            // Enforce delivery model rules based on team size
+            const deliveryExpert = document.getElementById('delivery-expert');
+            const deliveryManaged = document.getElementById('delivery-managed');
+            const deliveryManagedLabel = document.getElementById('delivery-managed-label');
+            const deliveryTip = document.getElementById('delivery-tip');
+
+            if (deliveryManaged && deliveryExpert && deliveryManagedLabel && deliveryTip) {
+                if (teamSize < 8) {
+                    // Disable Fully-Managed when team < 8 and show tip
+                    deliveryManaged.disabled = true;
+                    if (deliveryManaged.checked) {
+                        deliveryExpert.checked = true;
+                    }
+                    deliveryManagedLabel.style.opacity = '0.5';
+                    deliveryManagedLabel.style.cursor = 'not-allowed';
+                    deliveryTip.textContent = 'Fully-Managed with SLA is available for teams with 8 or more engineers.';
+                } else {
+                    // Enable Fully-Managed and clear tip
+                    deliveryManaged.disabled = false;
+                    deliveryManagedLabel.style.opacity = '1';
+                    deliveryManagedLabel.style.cursor = 'pointer';
+                    deliveryTip.textContent = '';
+                }
+            }
+
+            // Calculate engineers freed (DIY vs GS FTE)
+            const engineersFreed = Math.max(0, totalFTE_DIY - gsFTE);
+
+            // Update FTE and engineers display
+            document.getElementById('diy-fte').textContent = totalFTE_DIY;
+            document.getElementById('gs-fte').textContent = gsFTE;
+            document.getElementById('engineers-freed').textContent = engineersFreed + ' engineers';
 
             // Trigger ROI calculation
             calculateROI();
@@ -1441,13 +1553,12 @@
         function manualTeamAdjust() {
             const teamSize = parseInt(document.getElementById('team').value);
             document.getElementById('team-value').textContent = teamSize;
-            calculateROI();
+            updateResult();
         }
 
         // ROI Calculator
         function calculateROI() {
             // Get inputs
-            const teamSize = parseInt(document.getElementById('team').value);
             const coresBucket = parseInt(document.getElementById('cores').value);
 
             // Update core range display
@@ -1466,11 +1577,12 @@
             const selectedCaps = capabilities.filter(cap => cap && cap.checked);
             const capCount = selectedCaps.length;
 
-            // Calculate DIY cost (€120K per FTE average)
-            const diyCost = teamSize * 120000;
+            // Calculate DIY cost (€120K per engineer based on in-house team size slider)
+            const teamSizeForDIY = parseInt(document.getElementById('team').value) || 0;
+            const diyCost = teamSizeForDIY * 120000;
 
             // Calculate Giant Swarm cost
-            // 3 FTE liaison team + platform fees per selected capability and core range
+            // Platform fees per selected capability and core range
             // Pricing table indexed by core bucket (1-6) corresponding to:
             // 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000 cores
             const capPricesByCore = {
@@ -1491,26 +1603,40 @@
                 }
             });
 
-            // Base GS cost before applying target caps
-            let gsCost = (3 * 120000) + gsPlatformFees;
+            // Base GS platform cost before applying delivery model multiplier
+            let gsPlatformCost = gsPlatformFees;
 
-            // Cap GS cost per core bucket (Target Price Total per core step)
+            // Apply delivery model multiplier (Fully-Managed with SLA = +10%) when allowed
+            const deliveryManaged = document.getElementById('delivery-managed');
+            const teamSize = parseInt(document.getElementById('team').value);
+            const isFullyManagedActive =
+                deliveryManaged &&
+                !deliveryManaged.disabled &&
+                deliveryManaged.checked &&
+                teamSize >= 8;
+
+            if (isFullyManagedActive) {
+                gsPlatformCost = gsPlatformCost * 1.10;
+            }
+
+            // Add in-house FTE cost for working with Giant Swarm
+            const gsFteText = document.getElementById('gs-fte')?.textContent || '0';
+            const gsFTE = parseFloat(gsFteText) || 0;
+            let gsCost = gsPlatformCost + (gsFTE * 120000);
+
+            // Cap GS total cost per core bucket (Target Price Total per core step)
             // Buckets: 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000
             const targetGsTotals = [96000, 180000, 240000, 300000, 400000, 480000];
             const coreIndex = Math.min(Math.max(coresBucket, 1), 6) - 1; // 0-5
-            gsCost = Math.min(gsCost, targetGsTotals[coreIndex]);
+
+            // Only cap when using Enterprise Support; Fully-Managed can exceed the target bands
+            if (!isFullyManagedActive) {
+                gsCost = Math.min(gsCost, targetGsTotals[coreIndex]);
+            }
 
             // Calculate savings
             const savings = Math.max(0, diyCost - gsCost);
 
-            // Calculate engineers freed (team size - 3 liaison)
-            const engineersFreed = Math.max(0, teamSize - 3);
-
-            // Calculate FTEs needed with Giant Swarm based on core bucket
-            // Cores buckets: 1: 125, 2: 250, 3: 500, 4: 1,000, 5: 1,500, 6: 2,000
-            const gsFTEByCore = [0.5, 0.5, 1.0, 1.0, 1.5, 1.5];
-            const gsFTEIndex = Math.min(Math.max(coresBucket, 1), 6) - 1;
-            const gsFTE = gsFTEByCore[gsFTEIndex];
 
             // Format numbers
             const formatEuro = (num) => {
@@ -1524,13 +1650,11 @@
             document.getElementById('diy-cost').textContent = formatEuro(diyCost);
             document.getElementById('gs-cost').textContent = formatEuro(gsCost);
             document.getElementById('savings').textContent = formatEuro(savings);
-            document.getElementById('engineers-freed').textContent = engineersFreed + ' engineers';
-            document.getElementById('gs-fte').textContent = gsFTE;
         }
 
         // Initialize calculator on load
         document.addEventListener('DOMContentLoaded', () => {
-            autoUpdateTeamSize();
+            updateResult();
         });
 
         // Smooth scroll for anchor links
